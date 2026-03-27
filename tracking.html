@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Order - Bot Craft</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0a0f1f, #0f1a2f);
+            min-height: 100vh;
+            color: white;
+        }
+        .container { max-width: 700px; margin: 0 auto; padding: 2rem; }
+        .track-card {
+            background: rgba(15, 25, 45, 0.8);
+            backdrop-filter: blur(12px);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            border: 1px solid #646cff;
+        }
+        h1 { text-align: center; color: #646cff; margin-bottom: 2rem; font-size: 1.8rem; }
+        .input-group { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
+        .track-input {
+            flex: 1;
+            padding: 1rem;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #646cff;
+            border-radius: 1rem;
+            color: white;
+        }
+        .track-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #646cff, #00ccff);
+            border: none;
+            border-radius: 1rem;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .order-detail {
+            background: rgba(0,0,0,0.3);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        .status {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 2rem;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+        .status-pending { background: #ff9900; color: #000; }
+        .status-completed { background: #00ff00; color: #000; }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .not-found { text-align: center; padding: 2rem; color: #ffaa00; }
+        .back-link {
+            display: inline-block;
+            margin-top: 1rem;
+            color: #646cff;
+            text-decoration: none;
+        }
+        .back-link:hover { text-decoration: underline; }
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .input-group { flex-direction: column; }
+            .track-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="track-card">
+            <h1><i class="fas fa-search"></i> Track Your Order</h1>
+            <div class="input-group">
+                <input type="text" id="orderId" class="track-input" placeholder="Enter Order ID (e.g., BC123456)">
+                <button class="track-btn" onclick="trackOrder()">Track Order</button>
+            </div>
+            <div id="result"></div>
+            <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
+        </div>
+    </div>
+    <script>
+        function getOrder(id) {
+            const orders = JSON.parse(localStorage.getItem('botcraft_orders')) || [];
+            return orders.find(o => o.id === id);
+        }
+        function trackOrder() {
+            const id = document.getElementById('orderId').value.trim();
+            const result = document.getElementById('result');
+            if (!id) { alert('Enter Order ID'); return; }
+            const order = getOrder(id);
+            if (order) {
+                result.innerHTML = `
+                    <div class="order-detail">
+                        <div class="status status-${order.status}">${order.status.toUpperCase()}</div>
+                        <div class="detail-row"><span>Order ID:</span><strong>${order.id}</strong></div>
+                        <div class="detail-row"><span>Service:</span><strong>${order.service}</strong></div>
+                        <div class="detail-row"><span>Amount:</span><strong>₹${order.amount}</strong></div>
+                        <div class="detail-row"><span>Date:</span><strong>${new Date(order.timestamp).toLocaleString()}</strong></div>
+                        <div class="detail-row"><span>Discord:</span><strong>${order.customerName}</strong></div>
+                        <div class="detail-row"><span>Email:</span><strong>${order.customerEmail}</strong></div>
+                        <div class="detail-row"><span>Support:</span><strong>discord.gg/AvyWrY9T9F</strong></div>
+                    </div>
+                `;
+            } else {
+                result.innerHTML = `<div class="not-found"><i class="fas fa-exclamation-triangle"></i><p>Order not found!</p><p>Contact support on Discord: discord.gg/AvyWrY9T9F</p></div>`;
+            }
+        }
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('id');
+        if (orderId) { document.getElementById('orderId').value = orderId; trackOrder(); }
+    </script>
+</body>
+</html>

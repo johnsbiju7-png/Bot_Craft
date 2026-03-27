@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Panel - Bot Craft</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0a0f1f, #0f1a2f);
+            min-height: 100vh;
+            color: white;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .login-card, .panel-card {
+            background: rgba(15, 25, 45, 0.8);
+            backdrop-filter: blur(12px);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            border: 1px solid #646cff;
+        }
+        .login-form { max-width: 400px; margin: 0 auto; }
+        .login-form h2 { text-align: center; color: #646cff; margin-bottom: 2rem; }
+        .staff-input {
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #646cff;
+            border-radius: 1rem;
+            color: white;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #646cff, #00ccff);
+            border: none;
+            border-radius: 1rem;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-box {
+            background: rgba(0,0,0,0.4);
+            padding: 1.5rem;
+            text-align: center;
+            border-radius: 1rem;
+            border: 1px solid #646cff;
+        }
+        .stat-box h3 { font-size: 0.8rem; color: #aaa; margin-bottom: 0.5rem; }
+        .stat-box p { font-size: 2rem; font-weight: bold; color: #646cff; }
+        .orders-list { max-height: 500px; overflow-y: auto; }
+        .order-item {
+            background: rgba(0,0,0,0.3);
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .order-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        .status-pending { background: #ff9900; color: #000; }
+        .status-completed { background: #00ff00; color: #000; }
+        .action-btn {
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+        .edit-btn { background: #646cff; color: white; }
+        .delete-btn { background: #ff4444; color: white; }
+        .complete-btn { background: #00ff00; color: #000; }
+        .invoice-btn { background: #5865F2; color: white; }
+        .logout-btn {
+            width: 100%;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #ff4444;
+            border: none;
+            border-radius: 1rem;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: #646cff;
+            text-decoration: none;
+        }
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .order-item { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loginSection">
+            <div class="login-card">
+                <div class="login-form">
+                    <h2><i class="fas fa-user-shield"></i> Staff Login</h2>
+                    <input type="text" id="staffUser" placeholder="Username" class="staff-input">
+                    <input type="password" id="staffPass" placeholder="Password" class="staff-input">
+                    <button class="login-btn" onclick="login()">Login</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="panelSection" style="display: none;">
+            <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Website</a>
+            <div class="panel-card">
+                <h2 style="margin-bottom: 1.5rem;"><i class="fas fa-chart-line"></i> Staff Dashboard</h2>
+                <div class="stats-grid">
+                    <div class="stat-box"><h3>Total Orders</h3><p id="totalOrders">0</p></div>
+                    <div class="stat-box"><h3>Pending</h3><p id="pendingOrders">0</p></div>
+                    <div class="stat-box"><h3>Completed</h3><p id="completedOrders">0</p></div>
+                    <div class="stat-box"><h3>Revenue</h3><p id="totalRevenue">₹0</p></div>
+                </div>
+                <div class="orders-list" id="ordersList"></div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const staffUsers = [
+            { username: 'owner321', password: 'owner321', role: 'owner' },
+            { username: 'admin', password: 'riftcloudadmin1', role: 'admin' },
+            { username: 'managerog123', password: 'managerog123', role: 'manager' },
+            { username: 'staff1583', password: 'staff1583', role: 'staff' }
+        ];
+        
+        let currentStaff = null;
+        let orders = JSON.parse(localStorage.getItem('botcraft_orders')) || [];
+
+        function saveOrders() { localStorage.setItem('botcraft_orders', JSON.stringify(orders)); }
+        
+        function login() {
+            const user = document.getElementById('staffUser').value;
+            const pass = document.getElementById('staffPass').value;
+            const staff = staffUsers.find(u => u.username === user && u.password === pass);
+            if (staff) {
+                currentStaff = staff;
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('panelSection').style.display = 'block';
+                loadDashboard();
+            } else { alert('Invalid credentials!'); }
+        }
+        
+        function logout() {
+            currentStaff = null;
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('panelSection').style.display = 'none';
+        }
+        
+        function loadDashboard() {
+            const total = orders.length;
+            const pending = orders.filter(o => o.status === 'pending').length;
+            const completed = orders.filter(o => o.status === 'completed').length;
+            const revenue = orders.filter(o => o.status === 'completed').reduce((sum, o) => sum + o.amount, 0);
+            
+            document.getElementById('totalOrders').textContent = total;
+            document.getElementById('pendingOrders').textContent = pending;
+            document.getElementById('completedOrders').textContent = completed;
+            document.getElementById('totalRevenue').textContent = `₹${revenue}`;
+            
+            const list = document.getElementById('ordersList');
+            list.innerHTML = '';
+            orders.forEach(order => {
+                list.innerHTML += `
+                    <div class="order-item">
+                        <div><strong>${order.service}</strong> - ₹${order.amount}<br>
+                        <small>ID: ${order.id}</small><br>
+                        <small>${order.customerName} | ${order.customerEmail}</small><br>
+                        <small>${new Date(order.timestamp).toLocaleString()}</small></div>
+                        <div><span class="order-status status-${order.status}">${order.status}</span><br>
+                        <button class="action-btn edit-btn" onclick="editOrder('${order.id}')">Edit</button>
+                        <button class="action-btn delete-btn" onclick="deleteOrder('${order.id}')">Delete</button>
+                        ${order.status !== 'completed' ? `<button class="action-btn complete-btn" onclick="completeOrder('${order.id}')">Complete</button>` : ''}
+                        <button class="action-btn invoice-btn" onclick="generateInvoice('${order.id}')">Invoice</button></div>
+                    </div>
+                `;
+            });
+        }
+        
+        function editOrder(id) {
+            const order = orders.find(o => o.id === id);
+            if (!order) return;
+            const newService = prompt('Service:', order.service);
+            const newAmount = prompt('Amount:', order.amount);
+            if (newService) order.service = newService;
+            if (newAmount) order.amount = parseFloat(newAmount);
+            saveOrders();
+            loadDashboard();
+        }
+        
+        function deleteOrder(id) {
+            if (confirm('Delete this order?')) {
+                orders = orders.filter(o => o.id !== id);
+                saveOrders();
+                loadDashboard();
+            }
+        }
+        
+        function completeOrder(id) {
+            const order = orders.find(o => o.id === id);
+            if (order) {
+                order.status = 'completed';
+                saveOrders();
+                loadDashboard();
+                generateInvoice(id);
+                alert('Order completed! Invoice generated.');
+            }
+        }
+        
+        function generateInvoice(id) {
+            const order = orders.find(o => o.id === id);
+            if (!order) return;
+            const html = `
+                <div style="font-family: Arial; max-width: 600px; margin: 0 auto; background: white; padding: 2rem; border-radius: 10px;">
+                    <h1 style="color: #646cff;">BOT CRAFT</h1>
+                    <p>Premium Discord Bot Services</p>
+                    <hr>
+                    <h2>INVOICE</h2>
+                    <p><strong>Order ID:</strong> ${order.id}</p>
+                    <p><strong>Service:</strong> ${order.service}</p>
+                    <p><strong>Amount:</strong> ₹${order.amount}</p>
+                    <p><strong>Customer:</strong> ${order.customerName}</p>
+                    <p><strong>Email:</strong> ${order.customerEmail}</p>
+                    <p><strong>Date:</strong> ${new Date(order.timestamp).toLocaleString()}</p>
+                    <p><strong>UPI:</strong> johnsbiju@fam</p>
+                    <hr>
+                    <p>Thank you for choosing Bot Craft!</p>
+                    <p>Discord: discord.gg/AvyWrY9T9F</p>
+                </div>
+            `;
+            const win = window.open('', '_blank');
+            win.document.write(html);
+            win.document.close();
+            win.print();
+        }
+        
+        const saved = localStorage.getItem('botcraft_current_staff');
+        if (saved) {
+            currentStaff = JSON.parse(saved);
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('panelSection').style.display = 'block';
+            loadDashboard();
+        }
+    </script>
+</body>
+</html>

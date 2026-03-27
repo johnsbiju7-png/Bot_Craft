@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Craft — Premium Discord Bot & Website Development</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        /* MINIMAL AMBIENT ANIMATED BACKGROUND */
+        .ambient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10;
+            background: linear-gradient(135deg, #0a0a1a 0%, #0f0f1f 50%, #0a0a1a 100%);
+            overflow: hidden;
+        }
+
+        .ambient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: ambientFloat 25s ease-in-out infinite;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: rgba(100, 108, 255, 0.15);
+            top: -200px;
+            left: -150px;
+        }
+
+        .orb-2 {
+            width: 450px;
+            height: 450px;
+            background: rgba(0, 200, 255, 0.12);
+            bottom: -150px;
+            right: -100px;
+            animation-delay: -8s;
+        }
+
+        .orb-3 {
+            width: 350px;
+            height: 350px;
+            background: rgba(150, 100, 255, 0.1);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -15s;
+        }
+
+        @keyframes ambientFloat {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.4;
+            }
+            50% {
+                transform: translate(40px, 30px) scale(1.1);
+                opacity: 0.6;
+            }
+        }
+
+        .particle-field {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(100, 108, 255, 0.4);
+            border-radius: 50%;
+            animation: particleDrift 20s linear infinite;
+        }
+
+        @keyframes particleDrift {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(50px);
+                opacity: 0;
+            }
+        }
+
+        .grid-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(100, 108, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(100, 108, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        .dark-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Premium Glass Navigation */
+        .premium-nav {
+            background: rgba(15, 25, 45, 0.6);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(100, 108, 255, 0.2);
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #646cff, #00ccff);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon i {
+            font-size: 1.6rem;
+            color: white;
+        }
+
+        .logo-text h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, #646cff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .logo-text p {
+            font-size: 0.65rem;
+            color: #888;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            color: #646cff;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .discord-btn, .staff-btn {
+            padding: 0.6rem 1.3rem;
+            border-radius: 2rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            border: none;
+        }
+
+        .discord-btn {
+            background: #5865F2;
+            color: white;
+        }
+
+        .staff-btn {
+            background: rgba(100, 108, 255, 0.2);
+            border: 1px solid #646cff;
+            color: white;
+        }
+
+        .discord-btn:hover, .staff-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(100, 108, 255, 0.3);
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 70vh;
+            padding: 2rem 0;
+            flex-wrap: wrap;
+            gap: 3rem;
+        }
+
+        .hero-content { flex: 1; }
+
+        .badge {
+            display: inline-block;
+            background: rgba(100, 108, 255, 0.15);
+            border: 1px solid rgba(100, 108, 255, 0.4);
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-title {
+            font-size: 3.2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #646cff, #00ccff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 1rem;
+            color: #aaa;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .primary-btn, .secondary-btn {
+            padding: 0.9rem 2rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            border: none;
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, #646cff, #00ccff);
+            color: white;
+        }
+
+        .secondary-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(100, 108, 255, 0.5);
+            color: white;
+        }
+
+        .primary-btn:hover, .secondary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(100, 108, 255, 0.3);
+        }
+
+        .stats {
+            display: flex;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #646cff;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .hero-icon {
+            flex: 1;
+            text-align: center;
+        }
+
+        .floating-icon {
+            background: rgba(100, 108, 255, 0.05);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            border: 1px solid rgba(100, 108, 255, 0.2);
+            animation: floatIcon 5s ease-in-out infinite;
+        }
+
+        .floating-icon i {
+            font-size: 4rem;
+            margin: 0 1rem;
+            color: #646cff;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        /* Section Title */
+        .section-title {
+            text-align: center;
+            font-size: 2.2rem;
+            margin: 4rem 0 2rem;
+        }
+
+        .section-title span {
+            background: linear-gradient(135deg, #646cff, #00ccff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <!-- MINIMAL AMBIENT ANIMATED BACKGROUND -->
+    <div class="ambient-bg">
+        <div class="ambient-orb orb-1"></div>
+        <div class="ambient-orb orb-2"></div>
+        <div class="ambient-orb orb-3"></div>
+        <div class="particle-field" id="particleField"></div>
+        <div class="grid-overlay"></div>
+        <div class="dark-overlay"></div>
+    </div>
+    
+    <div class="container">
+        <nav class="premium-nav">
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-robot"></i></div>
+                <div class="logo-text">
+                    <h1>BOT CRAFT</h1>
+                    <p>Development Team</p>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a class="nav-link" onclick="scrollToSection('home')">Home</a>
+                <a class="nav-link" onclick="scrollToSection('services')">Services</a>
+                <a class="nav-link" onclick="scrollToSection('packages')">Packages</a>
+                <a class="nav-link" onclick="openTracking()">Track Order</a>
+            </div>
+            <div class="nav-buttons">
+                <a href="https://discord.gg/AvyWrY9T9F" class="discord-btn" target="_blank"><i class="fab fa-discord"></i> Join Discord</a>
+                <button class="staff-btn" onclick="window.location.href='staff.html'"><i class="fas fa-user-shield"></i> Staff</button>
+            </div>
+        </nav>
+        
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <div class="badge"><i class="fas fa-code"></i> Expert Discord Bot Developers</div>
+                <h1 class="hero-title">Crafting <span class="gradient-text">Premium</span><br>Discord Bots & Websites</h1>
+                <p class="hero-desc">Professional bot development • Custom features • 24/7 support • Fast delivery</p>
+                <div class="hero-buttons">
+                    <button class="primary-btn" onclick="scrollToSection('packages')"><i class="fas fa-shopping-cart"></i> Get Started</button>
+                    <button class="secondary-btn" onclick="openTracking()"><i class="fas fa-search"></i> Track Order</button>
+                </div>
+                <div class="stats">
+                    <div class="stat-item"><span class="stat-number">500+</span><span class="stat-label">Bots Delivered</span></div>
+                    <div class="stat-item"><span class="stat-number">200+</span><span class="stat-label">Websites</span></div>
+                    <div class="stat-item"><span class="stat-number">98%</span><span class="stat-label">Satisfaction</span></div>
+                </div>
+            </div>
+            <div class="hero-icon">
+                <div class="floating-icon">
+                    <i class="fab fa-discord"></i>
+                    <i class="fas fa-code"></i>
+                    <i class="fas fa-globe"></i>
+                </div>
+            </div>
+        </section>
+
+<!-- SERVICES SECTION -->
+<section id="services">
+    <h2 class="section-title">Our <span>Services</span></h2>
+    <div class="services-grid">
+        <div class="service-card">
+            <div class="service-icon"><i class="fab fa-discord"></i></div>
+            <h3>Custom Discord Bot</h3>
+            <p>Moderation, Economy, Music, Ticket System, Leveling, Giveaway, and any custom feature</p>
+            <div class="price-tag">₹99 - ₹499</div>
+            <button class="order-btn" onclick="openPayment('Custom Discord Bot', 299)">Order Now →</button>
+        </div>
+        <div class="service-card">
+            <div class="service-icon"><i class="fas fa-server"></i></div>
+            <h3>Discord Server Setup</h3>
+            <p>Complete server configuration with roles, channels, permissions, bots, and automation</p>
+            <div class="price-tag">₹199 - ₹399</div>
+            <button class="order-btn" onclick="openPayment('Discord Server Setup', 299)">Order Now →</button>
+        </div>
+        <div class="service-card">
+            <div class="service-icon"><i class="fas fa-globe"></i></div>
+            <h3>Custom Website</h3>
+            <p>Professional websites with admin panel, payment gateway, and responsive design</p>
+            <div class="price-tag">₹299 - ₹999</div>
+            <button class="order-btn" onclick="openPayment('Custom Website', 499)">Order Now →</button>
+        </div>
+    </div>
+</section>
+
+<style>
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+    .service-card {
+        background: rgba(15, 25, 45, 0.5);
+        backdrop-filter: blur(12px);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        text-align: center;
+        border: 1px solid rgba(100, 108, 255, 0.15);
+        transition: all 0.3s;
+    }
+    .service-card:hover {
+        transform: translateY(-5px);
+        border-color: #646cff;
+        background: rgba(15, 25, 45, 0.7);
+    }
+    .service-icon {
+        width: 65px;
+        height: 65px;
+        background: rgba(100, 108, 255, 0.15);
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.2rem;
+    }
+    .service-icon i {
+        font-size: 2rem;
+        color: #646cff;
+    }
+    .service-card h3 {
+        font-size: 1.3rem;
+        margin-bottom: 0.8rem;
+    }
+    .service-card p {
+        color: #aaa;
+        font-size: 0.85rem;
+        margin-bottom: 1.2rem;
+        line-height: 1.5;
+    }
+    .price-tag {
+        display: inline-block;
+        background: linear-gradient(135deg, #646cff, #00ccff);
+        padding: 0.3rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.8rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+    .order-btn {
+        width: 100%;
+        padding: 0.7rem;
+        background: rgba(100, 108, 255, 0.2);
+        border: 1px solid #646cff;
+        border-radius: 2rem;
+        color: white;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .order-btn:hover {
+        background: linear-gradient(135deg, #646cff, #00ccff);
+        transform: scale(1.02);
+    }
+</style>
+
+<!-- PACKAGES SECTION -->
+<section id="packages">
+    <h2 class="section-title">Choose Your <span>Package</span></h2>
+    <div class="packages-grid">
+        <div class="package-card">
+            <div class="package-icon"><i class="fas fa-rocket"></i></div>
+            <h3>Starter</h3>
+            <div class="package-price">₹99</div>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Basic Discord Bot</li>
+                <li><i class="fas fa-check-circle"></i> 5 Custom Commands</li>
+                <li><i class="fas fa-check-circle"></i> 24/7 Hosting</li>
+                <li><i class="fas fa-check-circle"></i> Basic Support</li>
+            </ul>
+            <button class="package-btn" onclick="openPayment('Starter Package', 99)">Get Started</button>
+        </div>
+        <div class="package-card popular">
+            <div class="popular-tag">🔥 MOST POPULAR</div>
+            <div class="package-icon"><i class="fas fa-crown"></i></div>
+            <h3>Professional</h3>
+            <div class="package-price">₹299</div>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Custom Discord Bot</li>
+                <li><i class="fas fa-check-circle"></i> Discord Server Setup</li>
+                <li><i class="fas fa-check-circle"></i> 15+ Custom Commands</li>
+                <li><i class="fas fa-check-circle"></i> Premium Support</li>
+            </ul>
+            <button class="package-btn" onclick="openPayment('Professional Package', 299)">Get Started</button>
+        </div>
+        <div class="package-card">
+            <div class="package-icon"><i class="fas fa-gem"></i></div>
+            <h3>Ultimate</h3>
+            <div class="package-price">₹599</div>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Everything in Professional</li>
+                <li><i class="fas fa-check-circle"></i> Custom Website</li>
+                <li><i class="fas fa-check-circle"></i> Unlimited Commands</li>
+                <li><i class="fas fa-check-circle"></i> Lifetime Support</li>
+            </ul>
+            <button class="package-btn" onclick="openPayment('Ultimate Package', 599)">Get Started</button>
+        </div>
+    </div>
+</section>
+
+<style>
+    .packages-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+    .package-card {
+        background: rgba(15, 25, 45, 0.6);
+        backdrop-filter: blur(12px);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        text-align: center;
+        border: 1px solid rgba(100, 108, 255, 0.2);
+        transition: all 0.3s;
+        position: relative;
+    }
+    .package-card:hover {
+        transform: translateY(-5px);
+        border-color: #646cff;
+    }
+    .package-card.popular {
+        border-color: #646cff;
+        transform: scale(1.02);
+    }
+    .popular-tag {
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #646cff, #00ccff);
+        padding: 0.3rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.7rem;
+        font-weight: bold;
+    }
+    .package-icon {
+        font-size: 2.5rem;
+        margin: 1rem 0;
+        color: #646cff;
+    }
+    .package-card h3 {
+        font-size: 1.4rem;
+        margin-bottom: 0.5rem;
+    }
+    .package-price {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #646cff;
+        margin-bottom: 1.2rem;
+    }
+    .package-card ul {
+        list-style: none;
+        margin-bottom: 1.5rem;
+        text-align: left;
+    }
+    .package-card li {
+        padding: 0.4rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+    }
+    .package-card li i {
+        color: #646cff;
+        font-size: 0.8rem;
+    }
+    .package-btn {
+        width: 100%;
+        padding: 0.7rem;
+        background: linear-gradient(135deg, #646cff, #00ccff);
+        border: none;
+        border-radius: 2rem;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .package-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(100, 108, 255, 0.4);
+    }
+</style>
+        
+        <!-- DISCORD CTA -->
+        <div class="discord-cta">
+            <i class="fab fa-discord"></i>
+            <h3>Join Our Discord Community</h3>
+            <p>Get support, track orders, and connect with our team</p>
+            <div class="cta-buttons">
+                <a href="https://discord.gg/AvyWrY9T9F" class="cta-discord" target="_blank"><i class="fab fa-discord"></i> Join Discord</a>
+                <button class="cta-order" onclick="scrollToSection('packages')"><i class="fas fa-shopping-cart"></i> Order Now</button>
+            </div>
+        </div>
+
+        <style>
+            .discord-cta {
+                background: rgba(15, 25, 45, 0.5);
+                backdrop-filter: blur(12px);
+                border-radius: 2rem;
+                padding: 2.5rem;
+                text-align: center;
+                margin: 3rem 0;
+                border: 1px solid rgba(100, 108, 255, 0.2);
+            }
+            .discord-cta i {
+                font-size: 2.5rem;
+                color: #5865F2;
+                margin-bottom: 1rem;
+            }
+            .discord-cta h3 {
+                font-size: 1.5rem;
+                margin-bottom: 0.5rem;
+            }
+            .discord-cta p {
+                color: #aaa;
+                margin-bottom: 1.2rem;
+            }
+            .cta-buttons {
+                display: flex;
+                gap: 1rem;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            .cta-discord {
+                background: #5865F2;
+                color: white;
+                padding: 0.7rem 1.5rem;
+                border-radius: 2rem;
+                text-decoration: none;
+                font-weight: 600;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            .cta-order {
+                background: linear-gradient(135deg, #646cff, #00ccff);
+                color: white;
+                padding: 0.7rem 1.5rem;
+                border-radius: 2rem;
+                text-decoration: none;
+                font-weight: 600;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                cursor: pointer;
+                border: none;
+            }
+            footer {
+                margin-top: 4rem;
+                padding-top: 2rem;
+                border-top: 1px solid rgba(100, 108, 255, 0.15);
+                text-align: center;
+                color: #666;
+                font-size: 0.75rem;
+            }
+            @media (max-width: 768px) {
+                .container { padding: 1rem; }
+                .premium-nav { flex-direction: column; text-align: center; }
+                .hero-title { font-size: 2rem; }
+                .hero-icon { display: none; }
+                .package-card.popular { transform: scale(1); }
+            }
+        </style>
+
+        <footer>
+            <p>© 2024 Bot Craft Development Team — Premium Discord Bot & Website Services</p>
+            <p style="margin-top: 0.5rem;">UPI: johnsbiju@fam | Discord: discord.gg/AvyWrY9T9F</p>
+        </footer>
+    </div>
+
+    <!-- PAYMENT MODAL -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-qrcode"></i> Complete Payment</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="payment-info">
+                    <p><strong>Service:</strong> <span id="modalService">-</span></p>
+                    <p><strong>Amount:</strong> ₹<span id="modalAmount">-</span></p>
+                </div>
+                <div class="qr-section">
+                    <h3>Scan to Pay</h3>
+                    <div id="qrCode"></div>
+                    <p class="upi-id">UPI: <strong>johnsbiju@fam</strong></p>
+                </div>
+                <div class="payment-form">
+                    <label><input type="checkbox" id="paymentConfirmed"> I have completed the payment</label>
+                    <input type="text" id="customerDiscord" placeholder="Your Discord Username" class="form-input">
+                    <input type="email" id="customerEmail" placeholder="Your Email Address" class="form-input">
+                    <button id="confirmBtn" class="confirm-payment" onclick="confirmPayment()" disabled>Confirm Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+        }
+        .modal-content {
+            background: linear-gradient(135deg, #0f192f, #0a1025);
+            margin: 5% auto;
+            border-radius: 1.5rem;
+            width: 90%;
+            max-width: 480px;
+            border: 1px solid #646cff;
+        }
+        .modal-header {
+            padding: 1.2rem;
+            border-bottom: 1px solid rgba(100, 108, 255, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h2 { color: #646cff; font-size: 1.3rem; margin: 0; }
+        .close {
+            font-size: 24px;
+            cursor: pointer;
+            color: #fff;
+            transition: 0.3s;
+        }
+        .close:hover { color: #646cff; }
+        .modal-body { padding: 1.2rem; }
+        .payment-info {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.8rem;
+            border-radius: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        .qr-section { text-align: center; margin: 1rem 0; }
+        #qrCode {
+            display: inline-block;
+            padding: 8px;
+            background: white;
+            border-radius: 0.8rem;
+            margin: 0.5rem 0;
+        }
+        .upi-id { font-size: 1rem; color: #646cff; }
+        .form-input {
+            width: 100%;
+            padding: 0.7rem;
+            margin: 0.5rem 0;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(100, 108, 255, 0.3);
+            border-radius: 0.8rem;
+            color: white;
+        }
+        .confirm-payment {
+            width: 100%;
+            padding: 0.7rem;
+            margin-top: 0.8rem;
+            background: linear-gradient(135deg, #646cff, #00ccff);
+            border: none;
+            border-radius: 0.8rem;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .confirm-payment:disabled { opacity: 0.5; cursor: not-allowed; }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        // Particle System
+        const particleField = document.getElementById('particleField');
+        for (let i = 0; i < 80; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDuration = Math.random() * 15 + 10 + 's';
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.width = Math.random() * 3 + 1 + 'px';
+            particle.style.height = particle.style.width;
+            particleField.appendChild(particle);
+        }
+
+        // Order System
+        let orders = JSON.parse(localStorage.getItem('botcraft_orders')) || [];
+        const UPI_ID = 'johnsbiju@fam';
+        let currentOrder = null;
+
+        function saveOrders() {
+            localStorage.setItem('botcraft_orders', JSON.stringify(orders));
+        }
+
+        function createOrder(service, amount, customerName, customerEmail) {
+            const order = {
+                id: 'BC' + Date.now() + Math.random().toString(36).substr(2, 6).toUpperCase(),
+                service: service,
+                amount: amount,
+                status: 'pending',
+                customerName: customerName,
+                customerEmail: customerEmail,
+                timestamp: new Date().toISOString(),
+                transactionId: 'TXN' + Math.random().toString(36).substr(2, 8).toUpperCase()
+            };
+            orders.unshift(order);
+            saveOrders();
+            return order;
+        }
+
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function openTracking() {
+            window.location.href = 'tracking.html';
+        }
+
+        function closeModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+        }
+
+        function openPayment(service, amount) {
+            const modal = document.getElementById('paymentModal');
+            document.getElementById('modalService').textContent = service;
+            document.getElementById('modalAmount').textContent = amount;
+            
+            const upiString = `upi://pay?pa=${UPI_ID}&pn=BotCraft&am=${amount}&cu=INR`;
+            document.getElementById('qrCode').innerHTML = '';
+            new QRCode(document.getElementById('qrCode'), {
+                text: upiString,
+                width: 180,
+                height: 180
+            });
+            
+            currentOrder = { service, amount };
+            modal.style.display = 'block';
+        }
+
+        function confirmPayment() {
+            if (!currentOrder) return;
+            
+            const discordName = document.getElementById('customerDiscord').value;
+            const email = document.getElementById('customerEmail').value;
+            
+            if (!discordName) { alert('Please enter Discord username!'); return; }
+            if (!email) { alert('Please enter email!'); return; }
+            
+            const newOrder = createOrder(currentOrder.service, currentOrder.amount, discordName, email);
+            
+            alert(`✅ Order Confirmed!\n\nOrder ID: ${newOrder.id}\nService: ${newOrder.service}\nAmount: ₹${newOrder.amount}\n\nWe'll contact you on Discord within 24 hours.`);
+            
+            closeModal();
+            document.getElementById('paymentConfirmed').checked = false;
+            document.getElementById('confirmBtn').disabled = true;
+            document.getElementById('customerDiscord').value = '';
+            document.getElementById('customerEmail').value = '';
+            currentOrder = null;
+        }
+
+        document.getElementById('paymentConfirmed')?.addEventListener('change', (e) => {
+            document.getElementById('confirmBtn').disabled = !e.target.checked;
+        });
+
+        console.log('%c🤖 BOT CRAFT DEVELOPMENT TEAM', 'color: #646cff; font-size: 14px;');
+        console.log('%c💳 UPI: johnsbiju@fam', 'color: #00ccff;');
+        console.log('%c🔗 Discord: discord.gg/AvyWrY9T9F', 'color: #5865F2;');
+    </script>
+</body>
+</html>
